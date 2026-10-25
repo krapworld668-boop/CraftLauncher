@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CraftLauncher — Minecraft Launcher</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#4ade80;--bg:#080d0a;--panel:#111b14;--muted:#9caf9f}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:#f3fff5;font-family:Arial,sans-serif;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:linear-gradient(#15251a 1px,transparent 1px),linear-gradient(90deg,#15251a 1px,transparent 1px);background-size:40px 40px;opacity:.3}
+header{height:78px;padding:0 7%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #203b29;background:#0a110c;position:sticky;top:0;z-index:5}
+.logo{font-size:22px;font-weight:900;letter-spacing:-1px}.logo span{color:var(--green)}
+.logo-icon{display:inline-grid;place-items:center;background:var(--green);color:#09210f;width:34px;height:34px;border-radius:9px;margin-right:8px}
+nav{display:flex;gap:25px;align-items:center}
+nav a{color:#a9bbad;text-decoration:none;font-size:14px}nav a:hover{color:white}
+.nav-btn{border:1px solid #347a49;padding:10px 14px;border-radius:9px;color:var(--green)}
+.wrap{width:min(1120px,90%);margin:auto}
+.hero{min-height:620px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;padding-top:65px;padding-bottom:65px}
+.tag{display:inline-block;padding:9px 13px;border:1px solid #285b38;background:#12271a;border-radius:30px;color:#9af5b4;font-size:12px;font-weight:bold;margin-bottom:23px}
+h1{font-size:clamp(43px,6vw,72px);line-height:1;letter-spacing:-3px;font-weight:950}
+h1 span{color:var(--green)}
+.description{color:var(--muted);line-height:1.8;margin-top:23px;font-size:16px;max-width:500px}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:29px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;font-weight:900;padding:17px 22px;border-radius:11px;transition:.2s}
+.primary{background:linear-gradient(135deg,#86efac,#22c55e);color:#06210e;box-shadow:0 8px 28px #22c55e25}
+.primary:hover{transform:translateY(-3px);box-shadow:0 10px 35px #22c55e55}
+.secondary{border:1px solid #294532;background:#111b14;color:#e0eee3}
+.secondary:hover{border-color:var(--green)}
+.note{font-size:12px;color:#718576;margin-top:14px}
+.showcase{position:relative;display:grid;place-items:center;min-height:420px}
+.glow{position:absolute;width:300px;height:300px;background:#22c55e;filter:blur(100px);opacity:.2}
+.window{position:relative;width:min(100%,440px);padding:20px;border:1px solid #315a3d;border-radius:20px;background:linear-gradient(145deg,#192b1e,#0b120d);box-shadow:0 30px 90px #0008;transform:rotate(-2deg)}
+.window-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid #294532;font-weight:bold}
+.dots{display:flex;gap:5px}.dots i{width:7px;height:7px;border-radius:50%;background:#4ade80}
+.world{height:215px;position:relative;overflow:hidden;border-radius:12px;margin:18px 0;background:linear-gradient(#173447,#456a65 60%,#4d8c48 60%,#245b32)}
+.sun{position:absolute;right:45px;top:22px;width:42px;height:42px;border-radius:50%;background:#e2ffad;box-shadow:0 0 30px #e2ffad66}
+.mountain{position:absolute;bottom:65px;width:0;height:0;border-left:110px solid transparent;border-right:110px solid transparent;border-bottom:130px solid #315844}
+.m1{left:-45px}.m2{left:105px;border-left-width:140px;border-right-width:140px;border-bottom-width:165px;border-bottom-color:#244632}
+.ground{position:absolute;bottom:0;width:100%;height:54px;background:repeating-linear-gradient(90deg,#28733d 0 34px,#205f32 34px 68px);border-top:7px solid #69ba56}
+.block{position:absolute;bottom:47px;width:45px;height:45px;border:2px solid #1a512a;background:linear-gradient(135deg,#73ad50 0 35%,#36773b 35%)}
+.b1{left:55px}.b2{left:100px;background:linear-gradient(135deg,#9c754d 0 35%,#6a4b32 35%)}.b3{right:65px;background:linear-gradient(135deg,#78a3b2 0 35%,#3e6373 35%)}
+.world-title{position:absolute;top:13px;left:14px;font-size:10px;font-weight:bold;letter-spacing:2px;text-shadow:0 2px 4px #000}
+.version-line{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.muted{font-size:11px;color:#8fa594;margin-bottom:6px}
+.ver-name{font-size:18px;font-weight:bold}
+.status{font-size:10px;color:#86efac;border:1px solid #285a38;background:#12271a;padding:8px 10px;border-radius:7px}
+.fake-play{margin-top:17px;background:linear-gradient(90deg,#86efac,#22c55e);color:#08210e;text-align:center;padding:13px;border-radius:8px;font-weight:900;font-size:12px;letter-spacing:2px}
+.float{position:absolute;background:#101b13;border:1px solid #31583b;border-radius:12px;padding:13px 15px;font-size:12px;font-weight:bold;box-shadow:0 10px 30px #0007}
+.float.one{top:35px;left:-10px;transform:rotate(-5deg)}.float.two{bottom:25px;right:-10px;transform:rotate(4deg);color:#a7f3bd}
+section{padding:75px 0;border-top:1px solid #1b3021}
+.section-head{text-align:center;margin-bottom:35px}
+.kicker{color:var(--green);font-size:11px;letter-spacing:2px;font-weight:bold}
+h2{font-size:clamp(30px,4vw,43px);letter-spacing:-1px;margin-top:10px}
+.sub{color:var(--muted);font-size:14px;line-height:1.7;margin-top:12px}
+.versions{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.version-card{padding:22px 18px;background:linear-gradient(145deg,#15241a,#0d140f);border:1px solid #263e2c;border-radius:15px;transition:.2s}
+.version-card:hover{transform:translateY(-5px);border-color:#4ade80}
+.version-icon{display:grid;place-items:center;width:48px;height:48px;background:#193823;border-radius:12px;font-size:25px;margin-bottom:18px}
+.version-card h3{font-size:17px;margin-bottom:11px}
+.version-card p{font-size:12px;color:var(--muted);line-height:1.6}
+.available{display:inline-block;color:#86efac;font-size:11px;margin-top:16px}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feature{padding:24px;border:1px solid #263e2c;border-radius:15px;background:#101911}
+.feature-icon{font-size:28px;margin-bottom:15px}
+.feature h3{font-size:17px;margin-bottom:10px}
+.feature p{color:var(--muted);font-size:13px;line-height:1.7}
+.download-panel{padding:42px 25px;text-align:center;border:1px solid #315b3c;border-radius:22px;background:radial-gradient(ellipse at top,#1c4228,#0d150f 70%)}
+.download-panel p{color:var(--muted);margin:15px auto 24px;line-height:1.7;max-width:520px;font-size:14px}
+footer{padding:28px 5%;text-align:center;color:#728576;border-top:1px solid #1b3021;font-size:12px;line-height:2}
+@media(max-width:800px){header{padding:0 5%;height:70px}nav{gap:12px}nav a:not(.nav-btn){display:none}.hero{grid-template-columns:1fr;padding-top:55px;gap:20px}.showcase{min-height:390px}.versions{grid-template-columns:repeat(2,1fr)}.features{grid-template-columns:1fr}.float.one{left:0}.float.two{right:0}}
+@media(max-width:430px){.wrap{width:92%}.logo{font-size:17px}h1{letter-spacing:-2px}.versions{gap:9px}.version-card{padding:16px 12px}.window{padding:14px}.float{font-size:10px}.btn{width:100%}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="#" style="text-decoration:none"><span class="logo-icon">⛏</span>CRAFT<span>LAUNCHER</span></a>
+  <nav>
+    <a href="#versions">Версии</a>
+    <a href="#features">Возможности</a>
+    <a href="#download" class="nav-btn">Скачать ↗</a>
+  </nav>
+</header>
+
+<main class="wrap hero">
+  <div>
+    <div class="tag">● ЛАУНЧЕР ДЛЯ WINDOWS</div>
+    <h1>Твой Minecraft.<br><span>Твои правила.</span></h1>
+    <p class="description">Запускай Minecraft через CraftLauncher. Выбирай доступную версию, устанавливай необходимые игровые файлы и отправляйся навстречу новым приключениям.</p>
+    <div class="actions">
+      <a class="btn primary" href="./CraftLauncherSetup.exe" download="CraftLauncherSetup.exe">⬇ СКАЧАТЬ ЛАУНЧЕР</a>
+      <a class="btn secondary" href="#versions">Посмотреть версии ↓</a>
+    </div>
+    <p class="note">Windows · Установщик EXE · Версии игры указаны ниже</p>
+  </div>
+
+  <div class="showcase">
+    <div class="glow"></div>
+    <div class="float one">🌿 ТВОЁ НОВОЕ ПРИКЛЮЧЕНИЕ</div>
+    <div class="window">
+      <div class="window-head"><span>🟩 CraftLauncher</span><span class="dots"><i></i><i></i><i></i></span></div>
+      <div class="world">
+        <div class="sun"></div><div class="mountain m1"></div><div class="mountain m2"></div>
+        <div class="world-title">EXPLORE YOUR WORLD</div>
+        <div class="block b1"></div><div class="block b2"></div><div class="block b3"></div><div class="ground"></div>
+      </div>
+      <div class="version-line">
+        <div><div class="muted">ВЫБРАННАЯ ВЕРСИЯ</div><div class="ver-name">Minecraft 1.21.11</div></div>
+        <div class="status">● В СПИСКЕ</div>
+      </div>
+      <div class="fake-play">ГОТОВ К ЗАПУСКУ</div>
+    </div>
+    <div class="float two">⚡ Просто. Быстро. Удобно.</div>
+  </div>
+</main>
+
+<section id="versions">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">ВЫБИРАЙ СВОЮ ИГРУ</div>
+      <h2>Доступные версии</h2>
+      <p class="sub">Выбери версию Minecraft в лаунчере и отправляйся в игру.</p>
+    </div>
+    <div class="versions">
+      <article class="version-card"><div class="version-icon">🌱</div><h3>1.20.4</h3><p>Версия Minecraft для приключений и строительства.</p><span class="available">● Указана в списке</span></article>
+      <article class="version-card"><div class="version-icon">💎</div><h3>1.21.8</h3><p>Исследуй миры и создавай собственные постройки.</p><span class="available">● Указана в списке</span></article>
+      <article class="version-card"><div class="version-icon">🪨</div><h3>1.21.10</h3><p>Выбирай эту версию для совместимых миров и серверов.</p><span class="available">● Указана в списке</span></article>
+      <article class="version-card"><div class="version-icon">🌳</div><h3>1.21.11</h3><p>Ещё один вариант для твоего следующего приключения.</p><span class="available">● Указана в списке</span></article>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">ПОЧЕМУ CRAFTLAUNCHER</div>
+      <h2>Всё для старта</h2>
+      <p class="sub">Минималистичный дизайн и удобный доступ к твоей игре.</p>
+    </div>
+    <div class="features">
+      <article class="feature"><div class="feature-icon">🎮</div><h3>Выбор версии</h3><p>Выбирай нужную версию в интерфейсе лаунчера. Фактический список зависит от сборки программы.</p></article>
+      <article class="feature"><div class="feature-icon">⚙️</div><h3>Установка файлов</h3><p>Лаунчер может загружать необходимые игровые файлы при установке версии.</p></article>
+      <article class="feature"><div class="feature-icon">🌍</div><h3>Новые приключения</h3><p>Исследуй миры, строй дома, добывай ресурсы и играй на совместимых серверах.</p></article>
+    </div>
+  </div>
+</section>
+
+<section id="download">
+  <div class="wrap">
+    <div class="download-panel">
+      <div class="kicker">НАЧНИ ИГРАТЬ</div>
+      <h2>Твой мир ждёт тебя</h2>
+      <p>Скачай установщик CraftLauncher для Windows. После загрузки открой EXE-файл и следуй инструкциям установщика.</p>
+      <a class="btn primary" href="./CraftLauncherSetup.exe" download="CraftLauncherSetup.exe">⬇ СКАЧАТЬ CRAFTLAUNCHER</a>
+      <p style="font-size:11px;margin-bottom:0">Если загрузка не начинается, проверь, что CraftLauncherSetup.exe лежит рядом с index.html.</p>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 CraftLauncher · Неофициальный лаунчер для Minecraft.<br>Minecraft является товарным знаком Mojang Studios. Этот проект не связан с Mojang или Microsoft.</footer>
+</body>
+</html>
+```
